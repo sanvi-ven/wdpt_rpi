@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import transforms
+from torchvision.models import resnet18, ResNet18_Weights
 from PIL import Image
 import time
 
@@ -18,10 +19,18 @@ device = torch.device("cpu")  # Pi 5 = CPU only
 # =========================
 # LOAD MODELS (TorchScript)
 # =========================
-model_sand = torch.jit.load("wdpt_sand.pt", map_location=device)
-model_topsoil = torch.jit.load("wdpt_topsoil.pt", map_location=device)
-
+# Sand model
+model_sand = resnet18(weights=ResNet18_Weights.DEFAULT)
+model_sand.fc = nn.Linear(model_sand.fc.in_features, 2)
+model_sand.load_state_dict(torch.load("resnet_wdpt.pth", map_location=device))
+model_sand.to(device)
 model_sand.eval()
+
+# Topsoil model
+model_topsoil = resnet18(weights=ResNet18_Weights.DEFAULT)
+model_topsoil.fc = nn.Linear(model_topsoil.fc.in_features, 2)
+model_topsoil.load_state_dict(torch.load("resnet_wdpt_topsoil.pth", map_location=device))
+model_topsoil.to(device)
 model_topsoil.eval()
 
 # =========================
