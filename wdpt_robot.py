@@ -18,8 +18,8 @@ device = torch.device("cpu")  # Pi 5 = CPU only
 # =========================
 # LOAD MODELS (TorchScript)
 # =========================
-model_sand = torch.jit.load("models/wdpt_sand.pt", map_location=device)
-model_topsoil = torch.jit.load("models/wdpt_topsoil.pt", map_location=device)
+model_sand = torch.jit.load("wdpt_sand.pt", map_location=device)
+model_topsoil = torch.jit.load("wdpt_topsoil.pt", map_location=device)
 
 model_sand.eval()
 model_topsoil.eval()
