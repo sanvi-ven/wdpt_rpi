@@ -53,7 +53,8 @@ transform = transforms.Compose([
 
 import cv2
 import os
-def extract_roi_frames(video_path, roi_coords=(713, 248, 1150, 452), output_folder="frame_inspection", fps_out=5):
+def extract_roi_frames(video_path, roi_coords=(684, 185, 984, 377), output_folder="frame_inspection", fps_out=5):
+# def extract_roi_frames(video_path, roi_coords=(713, 248, 1150, 452), output_folder="frame_inspection", fps_out=5):
 #def extract_roi_frames(video_path, roi_coords=(636, 233, 956, 450), output_folder="frame_inspection", fps_out=5):
     """
     Extract frames from a video at a specific FPS and save them as images in a folder.
@@ -219,9 +220,10 @@ def analyze_backwards(video_path, x1, y1, x2, y2, output_dir="reverse_analysis")
             print(f"End point identified at frame {i} ({end_time:.2f}s)")
             return end_time
 
-video_path = "/Users/sanviadmin/Desktop/IndependentResearchProject/SampleVideos/val/video_13.mov"
+video_path = "/Users/sanviadmin/Desktop/video_roi.mov"
 #roi_coords = (636, 233, 956, 450)
-roi_coords = (713, 248, 1150, 452)
+# roi_coords = (713, 248, 1150, 452)
+roi_coords = (684, 185, 984, 377)
 # 1. Extract ROI frames at 5 FPS
 frame_folder = extract_roi_frames(video_path, roi_coords, output_folder="frame_inspection", fps_out=5)
 
