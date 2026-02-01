@@ -6,6 +6,7 @@ from torchvision import transforms
 from torchvision.models import resnet18, ResNet18_Weights
 from PIL import Image
 import time
+import serial
 
 TARGET_FPS = 5        # frames per second to STORE
 MAX_FRAMES = 700      # hard safety cap
@@ -63,7 +64,7 @@ def classify_frame_np(frame_bgr):
 # ROI (FROM YOUR CODE)
 # =========================
 #ROI = (713, 248, 1150, 452)  # x1,y1,x2,y2
-ROI = (705, 333, 1022, 563)  # x1,y1,x2,y2
+ROI = (677, 323, 1061, 566)  # x1,y1,x2,y2
 
 # =========================
 # START DETECTION (WATER DROP)
@@ -129,7 +130,23 @@ def run_wdpt():
     )
 
     print("Waiting for water drop...")
+
+    #----
     start_time = detect_start(cap, backSub)
+    
+    # This is usually ttyACM0 or ttyUSB0
+    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+    time.sleep(2)  # let Arduino reset
+
+    print("Pump ON")
+    ser.write(b'1')
+    time.sleep(2)
+
+    print("Pump OFF")
+    ser.write(b'0')
+
+    ser.close()
+    #----
 
     # =========================
     # RECORD AFTER DROP
