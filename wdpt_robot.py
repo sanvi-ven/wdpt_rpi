@@ -65,7 +65,7 @@ def classify_frame_np(frame_bgr):
 # ROI (FROM YOUR CODE)
 # =========================
 #ROI = (713, 248, 1150, 452)  # x1,y1,x2,y2
-ROI = (677, 323, 1061, 566)  # x1,y1,x2,y2
+ROI = (684, 185, 984, 377)  # x1,y1,x2,y2
 
 # =========================
 # START DETECTION (WATER DROP)
