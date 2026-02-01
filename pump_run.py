@@ -7,7 +7,7 @@ time.sleep(2)  # let Arduino reset
 
 print("Pump ON")
 ser.write(b'1')
-time.sleep(12)
+time.sleep(20)
 
 print("Pump OFF")
 ser.write(b'0')
