@@ -32,6 +32,18 @@ def run_motor():
 		print("Enabling motor driver (STBY on)")
 		STBY.on()
 
+		# small delay to allow the GPIO level to settle, then verify the pin changed
+		time.sleep(0.05)
+		# verify physical pin level matches expected polarity
+		if getattr(STBY, 'active_high', True):
+			# active-high: expect a non-zero value after on()
+			if getattr(STBY, 'value', 0) == 0:
+				raise RuntimeError('STBY did not go high after STBY.on(); check wiring/power/polarity')
+		else:
+			# active-low: expect a zero value after on()
+			if getattr(STBY, 'value', 1) == 1:
+				raise RuntimeError('STBY did not go low after STBY.on() (active-low); check wiring/polarity')
+
 		print("Motor forward")
 		AIN1.off()
 		AIN2.on()
