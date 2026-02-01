@@ -347,8 +347,6 @@ def run_wdpt():
 
     print("Waiting for water drop...")
 
-    start_time = detect_start(cap, backSub)
-
     ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
     time.sleep(2)
 
@@ -359,6 +357,8 @@ def run_wdpt():
     print("Pump OFF")
     ser.write(b'0')
     ser.close()
+
+    start_time = detect_start(cap, backSub)
 
     # =========================
     # RECORD AFTER DROP
