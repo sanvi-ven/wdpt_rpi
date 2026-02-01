@@ -24,8 +24,8 @@ def run_motor():
 		STBY.on()
 
 		print("Motor forward")
-		AIN1.on()
-		AIN2.off()
+		AIN1.off()
+		AIN2.on()
 		PWMA.value = 0.5   # 50% speed
 
 		time.sleep(30)
