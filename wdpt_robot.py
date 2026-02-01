@@ -355,9 +355,6 @@ def run_wdpt():
     print("Waiting for water drop...")
     start_time = detect_start(cap, backSub)
 
-    time.sleep(2)    # allow full drop
-
-    ser.write(b'0')  # pump OFF
     ser.close()
 
 
