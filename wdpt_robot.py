@@ -147,7 +147,7 @@ def run_wdpt():
     # RECORD AFTER DROP
     # =========================
     frames = []
-    record_seconds = 20  # 2 minutes
+    record_seconds = 30  # 2 minutes
     start_record = time.time()
 
     frame_count = 0
