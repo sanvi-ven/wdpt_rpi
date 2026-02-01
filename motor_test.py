@@ -28,7 +28,7 @@ def run_motor():
 		AIN2.off()
 		PWMA.value = 0.5   # 50% speed
 
-		time.sleep(2)
+		time.sleep(30)
 
 		print("Motor stop")
 		PWMA.value = 0
