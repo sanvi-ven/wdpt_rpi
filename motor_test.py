@@ -11,6 +11,15 @@ PWMA = PWMOutputDevice(18, initial_value=0)
 # Standby pin (start disabled)
 STBY = DigitalOutputDevice(22, initial_value=False)
 
+# basic runtime checks
+if not hasattr(STBY, 'on'):
+	# gpiozero didn't initialize the device as expected
+	raise RuntimeError('gpiozero STBY device not available')
+
+# warn if STBY is configured active-low (polarity mismatch risk)
+if not getattr(STBY, 'active_high', True):
+	print("Warning: STBY appears to be active-low (active_high=False). Confirm wiring/polarity.")
+
 
 def run_motor():
 	try:
@@ -38,6 +47,24 @@ def run_motor():
 		# always disable driver on exit
 		print("Disabling motor driver (STBY off)")
 		STBY.off()
+
+		# explicitly close gpiozero devices to release GPIO cleanly
+		try:
+			PWMA.close()
+		except Exception:
+			pass
+		try:
+			AIN1.close()
+		except Exception:
+			pass
+		try:
+			AIN2.close()
+		except Exception:
+			pass
+		try:
+			STBY.close()
+		except Exception:
+			pass
 
 
 if __name__ == "__main__":
