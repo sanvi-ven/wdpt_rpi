@@ -135,11 +135,10 @@ def run_wdpt():
     time.sleep(2)
 
     ser.write(b'1')  # pump ON
-
-    print("Waiting for water drop...")
-    start_time = detect_start(cap, backSub)
-
     ser.close()
+
+    # print("Waiting for water drop...")
+    start_time = 0 # detect_start(cap, backSub)
 
     # =========================
     # RECORD AFTER DROP
@@ -185,7 +184,7 @@ def run_wdpt():
     )
 
     if ml_pred == 1:
-        end_time = detect_end(frames, fps)
+        end_time = detect_end(frames, TARGET_FPS)
         if end_time is not None:
             wdpt = end_time - start_time
             print(f"[RESULT] WDPT = {wdpt:.2f} seconds")
