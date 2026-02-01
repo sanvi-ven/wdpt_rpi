@@ -20,25 +20,26 @@ device = torch.device("cpu")  # Pi 5 = CPU only
 # =========================
 # LOAD MODELS (TorchScript)
 # =========================
-# Sand model
-model_sand = resnet18(weights=ResNet18_Weights.DEFAULT)
-model_sand.fc = nn.Linear(model_sand.fc.in_features, 2)
-model_sand.load_state_dict(torch.load("resnet_wdpt.pth", map_location=device))
-model_sand.to(device)
-model_sand.eval()
+def load_model(weights_path):
+    m = resnet18(weights=ResNet18_Weights.DEFAULT)
+    m.fc = nn.Linear(m.fc.in_features, 2)
+    m.load_state_dict(torch.load(weights_path, map_location=device))
+    m.to(device)
+    m.eval()
+    return m
 
-# Topsoil model
-model_topsoil = resnet18(weights=ResNet18_Weights.DEFAULT)
-model_topsoil.fc = nn.Linear(model_topsoil.fc.in_features, 2)
-model_topsoil.load_state_dict(torch.load("resnet_wdpt_topsoil.pth", map_location=device))
-model_topsoil.to(device)
-model_topsoil.eval()
+# Sand model
+model_sand = load_model("resnet_wdpt.pth")
+
+# Topsoil model  
+model_topsoil = load_model("resnet_wdpt_topsoil.pth")
 
 # =========================
 # TRANSFORM (INFERENCE ONLY)
 # =========================
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),  # Match working file
     transforms.ToTensor(),
     transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
@@ -111,7 +112,9 @@ def detect_end(frames, fps):
             thresh, cv2.MORPH_OPEN, np.ones((5,5), np.uint8)
         )
 
-        if np.count_nonzero(thresh) > 50:
+        diff_score = np.count_nonzero(thresh)
+
+        if diff_score > 50:  # Match working file threshold
             end_time = i / fps
             print(f"[END] Absorption finished at {end_time:.2f}s")
             return end_time
