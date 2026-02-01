@@ -1,29 +1,44 @@
 from gpiozero import PWMOutputDevice, DigitalOutputDevice
 import time
 
-# Direction pins
-AIN1 = DigitalOutputDevice(17)
-AIN2 = DigitalOutputDevice(27)
+# Direction pins (start low for safety)
+AIN1 = DigitalOutputDevice(17, initial_value=False)
+AIN2 = DigitalOutputDevice(27, initial_value=False)
 
-# PWM speed pin
-PWMA = PWMOutputDevice(18)
+# PWM speed pin (start at 0)
+PWMA = PWMOutputDevice(18, initial_value=0)
 
-# Standby pin
-STBY = DigitalOutputDevice(22)
+# Standby pin (start disabled)
+STBY = DigitalOutputDevice(22, initial_value=False)
 
-# Enable motor driver
-STBY.on()
 
-print("Motor forward")
-AIN1.on()
-AIN2.off()
-PWMA.value = 0.5   # 50% speed
+def run_motor():
+	try:
+		# ensure safe state before enabling driver
+		AIN1.off()
+		AIN2.off()
+		PWMA.value = 0
 
-time.sleep(2)
+		# enable motor driver
+		print("Enabling motor driver (STBY on)")
+		STBY.on()
 
-print("Motor stop")
-PWMA.value = 0
-AIN1.off()
-AIN2.off()
+		print("Motor forward")
+		AIN1.on()
+		AIN2.off()
+		PWMA.value = 0.5   # 50% speed
 
-STBY.off()
+		time.sleep(2)
+
+		print("Motor stop")
+		PWMA.value = 0
+		AIN1.off()
+		AIN2.off()
+	finally:
+		# always disable driver on exit
+		print("Disabling motor driver (STBY off)")
+		STBY.off()
+
+
+if __name__ == "__main__":
+	run_motor()
