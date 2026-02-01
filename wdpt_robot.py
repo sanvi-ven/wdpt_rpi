@@ -7,6 +7,8 @@ from torchvision.models import resnet18, ResNet18_Weights
 from PIL import Image
 import time
 import serial
+import os
+import shutil
 
 TARGET_FPS = 5        # frames per second to STORE
 MAX_FRAMES = 700      # hard safety cap
@@ -50,6 +52,45 @@ transform = transforms.Compose([
 # =========================
 # CLASSIFY NUMPY FRAME
 # =========================
+def delete_inspection_folder(folder_name="frame_inspection"):
+    # Get the absolute path to ensure we are looking in the right place
+    folder_path = os.path.abspath(folder_name)
+    
+    if os.path.exists(folder_path):
+        try:
+            shutil.rmtree(folder_path)
+            print(f"Successfully deleted: {folder_path}")
+        except Exception as e:
+            print(f"Error while deleting folder: {e}")
+    else:
+        print(f"The folder '{folder_name}' does not exist.")
+
+def get_last_frame_from_folder(folder_path):
+    files = sorted(os.listdir(folder_path))
+    if not files:
+        raise ValueError("No frames found in folder")
+    last_frame_path = os.path.join(folder_path, files[-1])
+    return last_frame_path
+
+def classify_last_frame_from_folder(folder_path):
+    last_frame_path = get_last_frame_from_folder(folder_path)
+    image_paths = [last_frame_path]
+
+    for path in image_paths:
+        image = Image.open(path).convert("RGB")
+        image = transform(image).unsqueeze(0).to(device)
+
+        with torch.no_grad():
+            pred_sand = model_sand(image).argmax(dim=1).item()
+            pred_topsoil = model_topsoil(image).argmax(dim=1).item()
+
+        print(f"{path} -> sand:{pred_sand}, topsoil:{pred_topsoil}")
+
+        # YOUR RULE: if either says 0 → final 0
+        final_pred = min(pred_sand, pred_topsoil)
+
+    return final_pred
+
 def classify_frame_np(frame_bgr):
     rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(rgb)
@@ -146,11 +187,16 @@ def run_wdpt():
     # =========================
     # RECORD AFTER DROP
     # =========================
-    frames = []
-    record_seconds = 30  # 2 minutes
+    output_folder = "frame_inspection"
+    delete_inspection_folder(output_folder)
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    record_seconds = 30  # 30 seconds
     start_record = time.time()
 
     frame_count = 0
+    saved_count = 0
     frame_interval = int(fps / TARGET_FPS) or 1
 
     while time.time() - start_record < record_seconds:
@@ -165,21 +211,25 @@ def run_wdpt():
         if frame_count % frame_interval == 0:
             x1, y1, x2, y2 = ROI
             roi = frame[y1:y2, x1:x2].copy()
-            frames.append(roi)
+            
+            # Save frame to disk like working file
+            frame_name = f"frame_{saved_count:04d}.jpg"
+            cv2.imwrite(os.path.join(output_folder, frame_name), roi)
+            saved_count += 1
 
         # Hard safety stop
-        if len(frames) >= MAX_FRAMES:
+        if saved_count >= MAX_FRAMES:
             print("[WARN] Max frame buffer reached")
             break
 
 
     cap.release()
+    print(f"Saved {saved_count} frames to '{output_folder}'")
 
     # =========================
     # ML CLASSIFICATION
     # =========================
-    final_frame = frames[-1]
-    ml_pred = classify_frame_np(final_frame)
+    ml_pred = classify_last_frame_from_folder(output_folder)
 
     print(
         f"[ML] Absorption check: "
@@ -187,6 +237,14 @@ def run_wdpt():
     )
 
     if ml_pred == 1:
+        # Load frames from disk for detect_end
+        files = sorted(os.listdir(output_folder))
+        frames = []
+        for file in files:
+            frame_path = os.path.join(output_folder, file)
+            frame = cv2.imread(frame_path)
+            frames.append(frame)
+        
         end_time = detect_end(frames, TARGET_FPS)
         if end_time is not None:
             wdpt = end_time - start_time
