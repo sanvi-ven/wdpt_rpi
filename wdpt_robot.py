@@ -237,7 +237,7 @@ def run_wdpt():
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    record_seconds = 30  # 30 seconds
+    record_seconds = 20  # 30 seconds
     start_record = time.time()
 
     frame_count = 0
