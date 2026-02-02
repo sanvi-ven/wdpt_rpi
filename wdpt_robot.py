@@ -164,8 +164,13 @@ def detect_end(frames, fps):
             output_dir = "reverse_analysis"
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            cv2.imwrite(f"{output_dir}/detected_end_point.jpg", frames[i])
-            print(f"Saved detection frame to {output_dir}/detected_end_point.jpg")
+            
+            # Add timestamp to filename to track different runs
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%H%M%S")
+            detection_filename = f"detected_end_point_{timestamp}_frame{i}.jpg"
+            cv2.imwrite(f"{output_dir}/{detection_filename}", frames[i])
+            print(f"Saved detection frame to {output_dir}/{detection_filename}")
             
             return end_time
 
