@@ -140,12 +140,37 @@ def detect_start(cap, backSub):
 # BACKWARD ABSORPTION DETECT
 # =========================
 def detect_end(frames, fps):
+    # Filter out any None frames and ensure all frames have the same size
+    valid_frames = []
+    expected_shape = None
+    
+    for frame in frames:
+        if frame is not None:
+            if expected_shape is None:
+                expected_shape = frame.shape
+            elif frame.shape == expected_shape:
+                valid_frames.append(frame)
+            else:
+                print(f"Warning: Frame with shape {frame.shape} doesn't match expected {expected_shape}, skipping")
+    
+    if len(valid_frames) < 2:
+        print("Error: Not enough valid frames for analysis")
+        return None
+        
+    frames = valid_frames
+    print(f"Analyzing {len(frames)} valid frames")
+    
     final_ref = cv2.cvtColor(frames[-1], cv2.COLOR_BGR2GRAY)
     final_ref = cv2.GaussianBlur(final_ref, (5,5), 0)
 
     for i in range(len(frames)-1, -1, -1):
         gray = cv2.cvtColor(frames[i], cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (5,5), 0)
+        
+        # Double-check sizes before operations
+        if gray.shape != final_ref.shape:
+            print(f"Warning: Size mismatch at frame {i}, skipping")
+            continue
 
         diff = cv2.absdiff(gray, final_ref)
         _, thresh = cv2.threshold(diff, 15, 255, cv2.THRESH_BINARY)
@@ -256,19 +281,31 @@ def run_wdpt():
     )
 
     if ml_pred == 1:
-        # Load frames from disk for detect_end
+        # Load frames from disk for detect_end with error checking
         files = sorted(os.listdir(output_folder))
         frames = []
-        for file in files:
-            frame_path = os.path.join(output_folder, file)
-            frame = cv2.imread(frame_path)
-            frames.append(frame)
+        loaded_count = 0
         
-        end_time = detect_end(frames, TARGET_FPS)
-        if end_time is not None:
-            wdpt = end_time - start_time
-            print(f"[RESULT] WDPT = {wdpt:.2f} seconds")
-            return wdpt
+        for file in files:
+            if file.endswith('.jpg'):  # Only process JPEG files
+                frame_path = os.path.join(output_folder, file)
+                frame = cv2.imread(frame_path)
+                if frame is not None:
+                    frames.append(frame)
+                    loaded_count += 1
+                else:
+                    print(f"Warning: Failed to load {frame_path}")
+        
+        print(f"Loaded {loaded_count} frames for analysis")
+        
+        if len(frames) > 0:
+            end_time = detect_end(frames, TARGET_FPS)
+            if end_time is not None:
+                wdpt = end_time - start_time
+                print(f"[RESULT] WDPT = {wdpt:.2f} seconds")
+                return wdpt
+        else:
+            print("Error: No valid frames loaded for analysis")
 
     print("[RESULT] Absorption not detected")
     return None
