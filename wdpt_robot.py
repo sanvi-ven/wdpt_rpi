@@ -113,7 +113,7 @@ ROI = (1700, 400, 2250, 800)  # x1,y1,x2,y2
 # START DETECTION (WATER DROP)
 # =========================
 def detect_start(cap, backSub):
-    fps = cap.get(cv2.CAP_PROP_FPS) or 30
+    fps = 1 #cap.get(cv2.CAP_PROP_FPS) or 30
     frame_count = 0
 
     while True:
