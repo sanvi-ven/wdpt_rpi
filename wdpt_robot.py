@@ -159,6 +159,14 @@ def detect_end(frames, fps):
             print(f"Detection at frame {i}, diff_score={diff_score}, end_time={i/fps:.2f}s")
             end_time = i / fps
             print(f"[END] Absorption finished at {end_time:.2f}s")
+            
+            # Save detection frame to reverse_analysis folder for inspection
+            output_dir = "reverse_analysis"
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            cv2.imwrite(f"{output_dir}/detected_end_point.jpg", frames[i])
+            print(f"Saved detection frame to {output_dir}/detected_end_point.jpg")
+            
             return end_time
 
     return None
@@ -169,6 +177,14 @@ def detect_end(frames, fps):
 def run_wdpt():
     cap = cv2.VideoCapture(0)  # Pi camera / USB cam
     fps = cap.get(cv2.CAP_PROP_FPS) or 30
+
+    # Camera warm-up period
+    print("Warming up camera...")
+    for i in range(30):  # Take 30 throwaway frames to let camera stabilize
+        ret, frame = cap.read()
+        if not ret:
+            continue
+    print("Camera warmed up")
 
     backSub = cv2.createBackgroundSubtractorMOG2(
         history=300, varThreshold=16, detectShadows=False
@@ -215,9 +231,9 @@ def run_wdpt():
             x1, y1, x2, y2 = ROI
             roi = frame[y1:y2, x1:x2].copy()
             
-            # Save frame to disk like working file
+            # Save frame to disk like working file with high quality JPEG
             frame_name = f"frame_{saved_count:04d}.jpg"
-            cv2.imwrite(os.path.join(output_folder, frame_name), roi)
+            cv2.imwrite(os.path.join(output_folder, frame_name), roi, [cv2.IMWRITE_JPEG_QUALITY, 95])
             saved_count += 1
 
         # Hard safety stop
