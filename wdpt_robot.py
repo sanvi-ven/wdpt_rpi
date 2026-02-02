@@ -179,6 +179,8 @@ def run_wdpt():
     time.sleep(2)
 
     ser.write(b'1')  # pump ON
+    time.sleep(1.5)  # wait for water to fall
+    ser.write(b'0')  # pump OFF
     ser.close()
 
     # print("Waiting for water drop...")
