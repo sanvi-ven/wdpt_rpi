@@ -202,7 +202,7 @@ def detect_end(frames, fps):
 # =========================
 def run_wdpt():
     cap = cv2.VideoCapture(0)  # Pi camera / USB cam
-    fps = cap.get(cv2.CAP_PROP_FPS) or 30
+    fps = 120 #cap.get(cv2.CAP_PROP_FPS) or 30
 
     # Camera warm-up period
     print("Warming up camera...")
@@ -242,7 +242,7 @@ def run_wdpt():
 
     frame_count = 0
     saved_count = 0
-    frame_interval = 5 # int(fps / TARGET_FPS) or 1
+    frame_interval = 24 # int(fps / TARGET_FPS) or 1
 
     while time.time() - start_record < record_seconds:
 
