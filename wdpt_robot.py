@@ -231,11 +231,9 @@ def run_wdpt():
             x1, y1, x2, y2 = ROI
             roi = frame[y1:y2, x1:x2].copy()
             
-            # Save frame to disk like working file with high quality JPEG
-            frame_roi_name = f"frame_roi_{saved_count:04d}.jpg"
+            # Save only ROI frame to disk (like working file)
             frame_name = f"frame_{saved_count:04d}.jpg"
-            cv2.imwrite(os.path.join(output_folder, frame_roi_name), roi, [cv2.IMWRITE_JPEG_QUALITY, 95])
-            cv2.imwrite(os.path.join(output_folder, frame_name), frame)
+            cv2.imwrite(os.path.join(output_folder, frame_name), roi, [cv2.IMWRITE_JPEG_QUALITY, 95])
             saved_count += 1
 
         # Hard safety stop
