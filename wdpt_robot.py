@@ -242,7 +242,7 @@ def run_wdpt():
 
     frame_count = 0
     saved_count = 0
-    frame_interval = int(fps / TARGET_FPS) or 1
+    frame_interval = 5 # int(fps / TARGET_FPS) or 1
 
     while time.time() - start_record < record_seconds:
 
