@@ -24,7 +24,7 @@ except Exception as e:
 
 print(f"{_now()}  Sleeping 12 seconds")
 start = time.time()
-time.sleep(1.5)
+time.sleep(12)
 elapsed = time.time() - start
 print(f"{_now()}  Woke after {elapsed:.2f} seconds")
 
