@@ -10,7 +10,7 @@ import serial
 import os
 import shutil
 
-TARGET_FPS = 5        # frames per second to STORE
+TARGET_FPS = 1        # frames per second to STORE
 MAX_FRAMES = 700      # hard safety cap
 
 
