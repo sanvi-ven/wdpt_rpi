@@ -10,7 +10,7 @@ import serial
 import os
 import shutil
 
-TARGET_FPS = 5        # frames per second to STORE
+TARGET_FPS = 1        # frames per second to STORE
 MAX_FRAMES = 700      # hard safety cap
 
 
@@ -181,7 +181,7 @@ def detect_end(frames, fps):
 
         diff_score = np.count_nonzero(thresh)
 
-        if diff_score > 50:  # Match working file threshold
+        if diff_score > 350:  # Match working file threshold
             print(f"Detection at frame {i}, diff_score={diff_score}, end_time={i/fps:.2f}s")
             end_time = i / fps
             print(f"[END] Absorption finished at {end_time:.2f}s")
