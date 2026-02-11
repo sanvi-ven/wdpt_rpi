@@ -6,7 +6,7 @@ stby = OutputDevice(12)
 stby.on()   # Enable motor drivers
 
 # ----- PWM (shared) -----
-pwm = PWMOutputDevice(18)
+pwm = PWMOutputDevice(13)
 pwm.value = 0.5   # 50% speed (0 to 1)
 
 # ----- DRIVER 1 -----
