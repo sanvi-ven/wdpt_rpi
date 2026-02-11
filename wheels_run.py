@@ -21,33 +21,40 @@ d2_ain2 = OutputDevice(23)
 d2_bin1 = OutputDevice(27)
 d2_bin2 = OutputDevice(22)
 
-def forward():
-    # Driver 1
-    d1_ain1.on()
-    d1_ain2.off()
-    d1_bin1.off()
-    d1_bin2.on()
+# ----- DRIVER 3: Tiller -----
+d3_ain1 = OutputDevice(4)
+d3_ain2 = OutputDevice(17)
 
-    # Driver 2
-    d2_ain1.off()
-    d2_ain2.on()
-    d2_bin1.on()
-    d2_bin2.off()
+def backward():
+    # # Driver 1
+    # d1_ain1.on()
+    # d1_ain2.off()
+    # d1_bin1.off()
+    # d1_bin2.on()
 
+    # # Driver 2
+    # d2_ain1.off()
+    # d2_ain2.on()
+    # d2_bin1.on()
+    # d2_bin2.off()
+    d3_ain1.off()
+    d3_ain2.on()
 def stop():
-    d1_ain1.off()
-    d1_ain2.off()
-    d1_bin1.off()
-    d1_bin2.off()
+    # d1_ain1.off()
+    # d1_ain2.off()
+    # d1_bin1.off()
+    # d1_bin2.off()
 
-    d2_ain1.off()
-    d2_ain2.off()
-    d2_bin1.off()
-    d2_bin2.off()
+    # d2_ain1.off()
+    # d2_ain2.off()
+    # d2_bin1.off()
+    # d2_bin2.off()
+    d3_ain1.off()
+    d3_ain2.off()
 
 # ---- Run ----
-forward()
-sleep(2)   # move forward for 2 seconds
+backward()
+sleep(1)   # move forward for 2 seconds
 stop()
 
 pwm.off()
