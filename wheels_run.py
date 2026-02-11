@@ -6,7 +6,7 @@ stby = OutputDevice(12)
 stby.on()   # Enable motor drivers
 
 # ----- PWM (shared) -----
-pwm = PWMOutputDevice(13)
+pwm = PWMOutputDevice(18) #13
 pwm.value = 0.5   # 50% speed (0 to 1)
 
 # ----- DRIVER 1 -----
@@ -26,31 +26,31 @@ d3_ain1 = OutputDevice(4)
 d3_ain2 = OutputDevice(17)
 
 def backward():
-    # # Driver 1
-    # d1_ain1.on()
-    # d1_ain2.off()
-    # d1_bin1.off()
-    # d1_bin2.on()
+    # Driver 1
+    d1_ain1.on()
+    d1_ain2.off()
+    d1_bin1.off()
+    d1_bin2.on()
 
-    # # Driver 2
-    # d2_ain1.off()
-    # d2_ain2.on()
-    # d2_bin1.on()
-    # d2_bin2.off()
-    d3_ain1.on()
-    d3_ain2.off()
+    # Driver 2
+    d2_ain1.off()
+    d2_ain2.on()
+    d2_bin1.on()
+    d2_bin2.off()
+    # d3_ain1.off()
+    # d3_ain2.on()
 def stop():
-    # d1_ain1.off()
-    # d1_ain2.off()
-    # d1_bin1.off()
-    # d1_bin2.off()
+    d1_ain1.off()
+    d1_ain2.off()
+    d1_bin1.off()
+    d1_bin2.off()
 
-    # d2_ain1.off()
-    # d2_ain2.off()
-    # d2_bin1.off()
-    # d2_bin2.off()
-    d3_ain1.off()
-    d3_ain2.off()
+    d2_ain1.off()
+    d2_ain2.off()
+    d2_bin1.off()
+    d2_bin2.off()
+    # d3_ain1.off()
+    # d3_ain2.off()
 
 # ---- Run ----
 backward()
