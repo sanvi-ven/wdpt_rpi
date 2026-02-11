@@ -37,8 +37,8 @@ def backward():
     # d2_ain2.on()
     # d2_bin1.on()
     # d2_bin2.off()
-    d3_ain1.off()
-    d3_ain2.on()
+    d3_ain1.on()
+    d3_ain2.off()
 def stop():
     # d1_ain1.off()
     # d1_ain2.off()
