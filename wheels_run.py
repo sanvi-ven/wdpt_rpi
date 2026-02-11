@@ -27,14 +27,14 @@ d3_ain2 = OutputDevice(17)
 
 def backward():
     # Driver 1
-    # d1_ain1.on()
-    # d1_ain2.off()
-    # d1_bin1.off()
-    # d1_bin2.on()
+    d1_ain1.on()
+    d1_ain2.off()
+    d1_bin1.off()
+    d1_bin2.on()
 
-    # # Driver 2
-    # d2_ain1.off()
-    # d2_ain2.on()
+    # Driver 2
+    d2_ain1.off()
+    d2_ain2.on()
     d2_bin1.on()
     d2_bin2.off()
     # d3_ain1.off()
