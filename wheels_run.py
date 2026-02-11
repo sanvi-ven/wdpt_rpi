@@ -25,8 +25,8 @@ def forward():
     # Driver 1
     d1_ain1.on()
     d1_ain2.off()
-    d1_bin1.on()
-    d1_bin2.off()
+    d1_bin1.off()
+    d1_bin2.on()
 
     # Driver 2
     d2_ain1.on()
