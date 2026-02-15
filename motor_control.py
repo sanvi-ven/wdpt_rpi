@@ -42,7 +42,7 @@ def forward(duration=2):
     wheel_pwm.value = 0.5
     # Correct forward for both sides
     d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
-    d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
+    d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
 def shallow_till(duration=3):
@@ -52,7 +52,7 @@ def shallow_till(duration=3):
     tiller_pwm.value = 0.5
     # Wheels forward
     d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
-    d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
+    d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
     # Tiller down
     d3_ain1.on(); d3_ain2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
@@ -64,7 +64,7 @@ def deep_till(duration=5):
     tiller_pwm.value = 0.5
     # Wheels forward
     d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
-    d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
+    d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
     # Tiller down
     d3_ain1.on(); d3_ain2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
