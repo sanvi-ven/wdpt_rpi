@@ -45,10 +45,10 @@ def forward(duration=1):
     d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
-def shallow_till(duration=0.5):
+def shallow_till(duration=0.3):
     print("Shallow till start")
     stby.on()
-    tiller_pwm.value = 0.5
+    tiller_pwm.value = 0.3
 
     # Move tiller down briefly
     d3_ain1.off()
@@ -61,7 +61,7 @@ def shallow_till(duration=0.5):
     # Then move wheels forward using existing forward() function
     forward(duration)
 
-def deep_till(duration=1):
+def deep_till(duration=0.5):
     print("Deep till start")
     stby.on()
     tiller_pwm.value = 0.5
@@ -69,7 +69,7 @@ def deep_till(duration=1):
     # Move tiller down longer if needed
     d3_ain1.off()
     d3_ain2.on()
-    sleep(1)  # longer pulse for deep till
+    sleep(0.5)  # longer pulse for deep till
     d3_ain1.off()
     d3_ain2.off()
     tiller_pwm.value = 0
