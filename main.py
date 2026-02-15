@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 from torchvision import transforms
 from torchvision.models import resnet18, ResNet18_Weights
+import threading
 
 # ---------------- SETTINGS ----------------
 PI_IP = "192.168.2.2"     # Pi static IP
@@ -52,6 +53,10 @@ start_time = time.time()
 frames = []
 
 print("Starting 2-minute recording...")
+
+# Start pump immediately
+threading.Thread(target=lambda: send_pi_command("PUMP_ON")).start()
+
 while True:
     ret, frame = cap.read()
     if not ret:
