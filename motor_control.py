@@ -36,7 +36,7 @@ wheel_pwm = PWMOutputDevice(18)     # Wheels PWM
 tiller_pwm = PWMOutputDevice(13)    # Tiller PWM
 
 
-def forward(duration=2):
+def forward(duration=1):
     print("Forward start")
     stby.on()
     wheel_pwm.value = 0.5
@@ -45,29 +45,37 @@ def forward(duration=2):
     d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
-def shallow_till(duration=3):
+def shallow_till(duration=0.25):
     print("Shallow till start")
     stby.on()
-    wheel_pwm.value = 0.5
     tiller_pwm.value = 0.5
-    # Wheels forward
-    d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
-    d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
-    # Tiller down
-    d3_ain1.on(); d3_ain2.off()
-    threading.Thread(target=stop_after, args=(duration,)).start()
+
+    # Move tiller down briefly
+    d3_ain1.on()
+    d3_ain2.off()
+    sleep(0.2)  # pulse duration for tiller
+    d3_ain1.off()
+    d3_ain2.off()
+    tiller_pwm.value = 0
+
+    # Then move wheels forward using existing forward() function
+    forward(duration)
 
 def deep_till(duration=5):
     print("Deep till start")
     stby.on()
-    wheel_pwm.value = 0.5
     tiller_pwm.value = 0.5
-    # Wheels forward
-    d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
-    d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
-    # Tiller down
-    d3_ain1.on(); d3_ain2.off()
-    threading.Thread(target=stop_after, args=(duration,)).start()
+
+    # Move tiller down longer if needed
+    d3_ain1.on()
+    d3_ain2.off()
+    sleep(0.5)  # longer pulse for deep till
+    d3_ain1.off()
+    d3_ain2.off()
+    tiller_pwm.value = 0
+
+    # Then move wheels forward
+    forward(duration)
 
 
 def run_pump(duration=3):
