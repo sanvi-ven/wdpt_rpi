@@ -41,10 +41,10 @@ pi_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 pi_sock.connect((PI_IP, PI_PORT))
 print("Connected to Pi motor server!")
 
-def send_pi_command(cmd):
+def send_pi_command(command):
     """Send a simple string command to the Pi."""
-    pi_sock.sendall(cmd.encode())
-    print(f"Sent to Pi: {cmd}")
+    pi_sock.sendall(command.encode())
+    print(f"Sent to Pi: {command}")
 
 # ---------------- CAMERA CAPTURE ----------------
 cap = cv2.VideoCapture(0)  # Mac camera
