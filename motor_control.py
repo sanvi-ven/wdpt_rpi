@@ -53,7 +53,7 @@ def shallow_till(duration=1):
     # Move tiller down briefly
     d3_ain1.off()
     d3_ain2.on()
-    sleep(0.35)  # pulse duration for tiller
+    sleep(0.2)  # pulse duration for tiller
     d3_ain1.off()
     d3_ain2.off()
     tiller_pwm.value = 0
@@ -61,7 +61,7 @@ def shallow_till(duration=1):
     # Then move wheels forward using existing forward() function
     forward(duration)
 
-def deep_till(duration=2):
+def deep_till(duration=1.5):
     print("Deep till start")
     stby.on()
     tiller_pwm.value = 0.4
@@ -69,7 +69,7 @@ def deep_till(duration=2):
     # Move tiller down longer if needed
     d3_ain1.off()
     d3_ain2.on()
-    sleep(0.8)  # longer pulse for deep till
+    sleep(0.75)  # longer pulse for deep till
     d3_ain1.off()
     d3_ain2.off()
     tiller_pwm.value = 0

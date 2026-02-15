@@ -152,6 +152,8 @@ def start_detection(video_path):
         roi = frame[313:653, 658:1005]
         # all detection only on the roi instead of the whole frame to reduce noise and false positives from other areas of the video
         kernel = np.ones((5,5), np.uint8)
+        # apply background subtraction to ROI, then remove small noise with morphological opening
+        fg_mask = backSub.apply(roi)
         fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_OPEN, kernel) # Removes tiny noise
         
         # calculate activity score(number of changing pixels)
@@ -218,7 +220,7 @@ def analyze_backwards(video_path, x1, y1, x2, y2, output_dir="reverse_analysis")
             print(f"End point identified at frame {i} ({end_time:.2f}s)")
             return end_time
 
-video_path = "/Users/sanviadmin/Desktop/video_roi.mov"
+video_path = "/Users/sanviadmin/Desktop/IndependentResearchProject/SampleVideos/test/video_3.mov"
 #roi_coords = (636, 233, 956, 450)
 # roi_coords = (713, 248, 1150, 452)
 roi_coords = (684, 185, 984, 377)
