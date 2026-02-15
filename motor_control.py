@@ -69,7 +69,7 @@ def deep_till(duration=2):
     # Move tiller down longer if needed
     d3_ain1.off()
     d3_ain2.on()
-    sleep(1.5)  # longer pulse for deep till
+    sleep(0.8)  # longer pulse for deep till
     d3_ain1.off()
     d3_ain2.off()
     tiller_pwm.value = 0
