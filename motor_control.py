@@ -45,7 +45,17 @@ def forward(duration=1):
     d2_ain1.on(); d2_ain2.off(); d2_bin1.off(); d2_bin2.on()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
-def shallow_till(duration=1):
+def backward(duration=1.2):
+    print("Backward start")
+    stby.on()
+    wheel_pwm.value = 0.5
+    # Correct forward for both sides
+    d1_ain1.on(); d1_ain2.off(); d1_bin1.off(); d1_bin2.on()
+    d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
+    threading.Thread(target=stop_after, args=(duration,)).start()
+
+
+def shallow_till(duration=2):
     print("Shallow till start")
     stby.on()
     tiller_pwm.value = 0.4
@@ -58,10 +68,10 @@ def shallow_till(duration=1):
     d3_ain2.off()
     tiller_pwm.value = 0
 
-    # Then move wheels forward using existing forward() function
-    forward(duration)
+    # Then move wheels backward using existing backward() function
+    backward(duration)
 
-def deep_till(duration=1.5):
+def deep_till(duration=2):
     print("Deep till start")
     stby.on()
     tiller_pwm.value = 0.4
@@ -74,8 +84,8 @@ def deep_till(duration=1.5):
     d3_ain2.off()
     tiller_pwm.value = 0
 
-    # Then move wheels forward
-    forward(duration)
+    # Then move wheels backward
+    backward(duration)
 
 
 def run_pump(duration=2):
