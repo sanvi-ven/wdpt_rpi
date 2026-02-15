@@ -33,27 +33,44 @@ arduino = serial.Serial(ARDUINO_PORT, 9600, timeout=1)
 sleep(2)
 
 # ---------------- MOTOR FUNCTIONS ----------------
+wheel_pwm = PWMOutputDevice(18)     # Wheels PWM
+tiller_pwm = PWMOutputDevice(13)    # Tiller PWM
+
 def forward(duration=2):
     print("Forward start")
-    d1_ain1.on(); d1_ain2.off(); d1_bin1.off(); d1_bin2.on()
+    stby.on()
+    wheel_pwm.value = 0.5
+    # Correct forward for both sides
+    d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
     d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
 def shallow_till(duration=3):
     print("Shallow till start")
-    pwm = PWMOutputDevice(13) # separate PWM for tiller if needed
-    pwm.value = 0.5   # 50% speed
+    stby.on()
+    wheel_pwm.value = 0.5
+    tiller_pwm.value = 0.5
+    # Wheels forward
+    d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
+    d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
+    # Tiller down
     d3_ain1.on(); d3_ain2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
 def deep_till(duration=5):
-    pwm = PWMOutputDevice(13) # separate PWM for tiller if needed
-    pwm.value = 0.5   # 50% speed
     print("Deep till start")
+    stby.on()
+    wheel_pwm.value = 0.5
+    tiller_pwm.value = 0.5
+    # Wheels forward
+    d1_ain1.off(); d1_ain2.on(); d1_bin1.on(); d1_bin2.off()
+    d2_ain1.off(); d2_ain2.on(); d2_bin1.on(); d2_bin2.off()
+    # Tiller down
     d3_ain1.on(); d3_ain2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
-def run_pump(duration=5):
+
+def run_pump(duration=3):
     print("Pump start")
     arduino.write(b'ON\n')
     threading.Thread(target=pump_off_after, args=(duration,)).start()
