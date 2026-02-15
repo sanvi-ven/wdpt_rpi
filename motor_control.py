@@ -51,9 +51,9 @@ def shallow_till(duration=0.25):
     tiller_pwm.value = 0.5
 
     # Move tiller down briefly
-    d3_ain1.on()
-    d3_ain2.off()
-    sleep(0.2)  # pulse duration for tiller
+    d3_ain1.off()
+    d3_ain2.on()
+    sleep(1)  # pulse duration for tiller
     d3_ain1.off()
     d3_ain2.off()
     tiller_pwm.value = 0
@@ -67,9 +67,9 @@ def deep_till(duration=0.5):
     tiller_pwm.value = 0.5
 
     # Move tiller down longer if needed
-    d3_ain1.on()
-    d3_ain2.off()
-    sleep(0.5)  # longer pulse for deep till
+    d3_ain1.off()
+    d3_ain2.on()
+    sleep(2)  # longer pulse for deep till
     d3_ain1.off()
     d3_ain2.off()
     tiller_pwm.value = 0
