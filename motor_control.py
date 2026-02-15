@@ -7,9 +7,8 @@ import serial
 
 # ---------------- MOTOR SETUP ----------------
 stby = OutputDevice(12)
-pwm = PWMOutputDevice(18)  # PWM for wheels
 stby.on()
-pwm.value = 0.5  # default speed
+
 
 # Driver 1
 d1_ain1 = OutputDevice(16)
@@ -35,6 +34,7 @@ sleep(2)
 # ---------------- MOTOR FUNCTIONS ----------------
 wheel_pwm = PWMOutputDevice(18)     # Wheels PWM
 tiller_pwm = PWMOutputDevice(13)    # Tiller PWM
+
 
 def forward(duration=2):
     print("Forward start")
