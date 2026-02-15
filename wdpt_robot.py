@@ -10,18 +10,13 @@ import serial
 import os
 import shutil
 
-TARGET_FPS = 1        # frames per second to STORE
+TARGET_FPS = 1        # frames per second to store
 MAX_FRAMES = 700      # hard safety cap
 
 
-# =========================
-# DEVICE
-# =========================
 device = torch.device("cpu")  # Pi 5 = CPU only
 
-# =========================
-# LOAD MODELS (TorchScript)
-# =========================
+# load models
 def load_model(weights_path):
     m = resnet18(weights=ResNet18_Weights.DEFAULT)
     m.fc = nn.Linear(m.fc.in_features, 2)
@@ -30,15 +25,13 @@ def load_model(weights_path):
     m.eval()
     return m
 
-# Sand model
+# sand model
 model_sand = load_model("resnet_wdpt.pth")
 
-# Topsoil model  
+# topsoil model  
 model_topsoil = load_model("resnet_wdpt_topsoil.pth")
 
-# =========================
-# TRANSFORM (INFERENCE ONLY)
-# =========================
+# transform (must match training)
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ColorJitter(brightness=0.2, contrast=0.2),  # Match working file
@@ -49,11 +42,10 @@ transform = transforms.Compose([
     )
 ])
 
-# =========================
-# CLASSIFY NUMPY FRAME
-# =========================
+# classify numpy frame
+
 def delete_inspection_folder(folder_name="frame_inspection"):
-    # Get the absolute path to ensure we are looking in the right place
+    # get file absolute path to ensure we are looking in the right place
     folder_path = os.path.abspath(folder_name)
     
     if os.path.exists(folder_path):
@@ -86,7 +78,7 @@ def classify_last_frame_from_folder(folder_path):
 
         print(f"{path} -> sand:{pred_sand}, topsoil:{pred_topsoil}")
 
-        # YOUR RULE: if either says 0 → final 0
+        # if either says 0 → final 0
         final_pred = min(pred_sand, pred_topsoil)
 
     return final_pred
@@ -100,18 +92,14 @@ def classify_frame_np(frame_bgr):
         sand = model_sand(image).argmax(1).item()
         topsoil = model_topsoil(image).argmax(1).item()
 
-    return min(sand, topsoil)  # YOUR RULE
+    return min(sand, topsoil) 
 
-# =========================
-# ROI (FROM YOUR CODE)
-# =========================
+# ROI
 #ROI = (713, 248, 1150, 452)  # x1,y1,x2,y2
 #ROI = (684, 185, 984, 377)  # x1,y1,x2,y2
 ROI = (1700, 400, 2250, 800)  # x1,y1,x2,y2
 
-# =========================
-# START DETECTION (WATER DROP)
-# =========================
+# start detection (water drop)
 def detect_start(cap, backSub):
     fps = 1 #cap.get(cv2.CAP_PROP_FPS) or 30
     frame_count = 0
@@ -137,9 +125,7 @@ def detect_start(cap, backSub):
             print(f"[START] Water landed at {start_time:.2f}s")
             return start_time
 
-# =========================
-# BACKWARD ABSORPTION DETECT
-# =========================
+# backward absorption detect
 def detect_end(frames, fps):
     # Filter out any None frames and ensure all frames have the same size
     valid_frames = []
@@ -168,7 +154,7 @@ def detect_end(frames, fps):
         gray = cv2.cvtColor(frames[i], cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (5,5), 0)
         
-        # Double-check sizes before operations
+        # double-check sizes before operations
         if gray.shape != final_ref.shape:
             print(f"Warning: Size mismatch at frame {i}, skipping")
             continue
@@ -181,12 +167,12 @@ def detect_end(frames, fps):
 
         diff_score = np.count_nonzero(thresh)
 
-        if diff_score > 350:  # Match working file threshold
+        if diff_score > 350:  # match working file threshold
             print(f"Detection at frame {i}, diff_score={diff_score}, end_time={i/fps:.2f}s")
             end_time = i / fps
             print(f"[END] Absorption finished at {end_time:.2f}s")
             
-            # Save detection frame to reverse_analysis folder for inspection
+            #save detection frame to reverse_analysis folder for inspection
             output_dir = "reverse_analysis"
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -197,11 +183,9 @@ def detect_end(frames, fps):
 
     return None
 
-# =========================
-# MAIN LOOP
-# =========================
+# main loop
 def run_wdpt():
-    cap = cv2.VideoCapture(0)  # Pi camera / USB cam
+    cap = cv2.VideoCapture(0)  # USB cam
     fps = 1 #cap.get(cv2.CAP_PROP_FPS) or 30
 
     # Camera warm-up period
@@ -229,9 +213,7 @@ def run_wdpt():
     # print("Waiting for water drop...")
     start_time = 0 # detect_start(cap, backSub)
 
-    # =========================
-    # RECORD AFTER DROP
-    # =========================
+    # record after drop
     output_folder = "frame_inspection"
     delete_inspection_folder(output_folder)
     if not os.path.exists(output_folder):
@@ -252,17 +234,17 @@ def run_wdpt():
 
         frame_count += 1
 
-        # Only store every Nth frame (≈5 FPS)
+        # only store every Nth frame (≈5 FPS)
         if frame_count % frame_interval == 0:
             x1, y1, x2, y2 = ROI
             roi = frame[y1:y2, x1:x2].copy()
             
-            # Save only ROI frame to disk (like working file)
+            # save only ROI frame to disk (like working file)
             frame_name = f"frame_{saved_count:04d}.jpg"
             cv2.imwrite(os.path.join(output_folder, frame_name), roi, [cv2.IMWRITE_JPEG_QUALITY, 95])
             saved_count += 1
 
-        # Hard safety stop
+        # hard safety stop
         if saved_count >= MAX_FRAMES:
             print("[WARN] Max frame buffer reached")
             break
@@ -271,9 +253,7 @@ def run_wdpt():
     cap.release()
     print(f"Saved {saved_count} frames to '{output_folder}'")
 
-    # =========================
-    # ML CLASSIFICATION
-    # =========================
+    # ml classification
     ml_pred = classify_last_frame_from_folder(output_folder)
 
     print(
@@ -311,9 +291,7 @@ def run_wdpt():
     print("[RESULT] Absorption not detected")
     return None
 
-# =========================
-# RUN
-# =========================
+# run
 if __name__ == "__main__":
     run_wdpt()
 

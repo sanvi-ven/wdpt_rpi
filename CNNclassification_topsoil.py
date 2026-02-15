@@ -1,3 +1,5 @@
+# Water Drop Penetration Time (WDPT) CNN Classification Model for Topsoil
+# This script trains a ResNet18 model to classify whether water has been absorbed in topsoil
 import os
 import pandas as pd
 from PIL import Image
@@ -155,42 +157,5 @@ for epoch in range(num_epochs):
         f"Train Acc: {train_acc:.3f} | "
         f"Val Acc: {val_acc:.3f}"
     )
-# After training
+# after training
 torch.save(model.state_dict(), "resnet_wdpt_topsoil.pth")
-
-# 1. Initialize the model architecture
-model = resnet18(weights=ResNet18_Weights.DEFAULT)
-model.fc = nn.Linear(model.fc.in_features, 2)  # same as training
-model = model.to(device)
-
-# 2. Load saved weights
-model.load_state_dict(torch.load("resnet_wdpt_topsoil.pth", map_location=device))
-model.eval()  # important! sets model to evaluation mode
-
-from PIL import Image
-from torchvision import transforms
-import torch
-
-# Define the same transform used in training
-transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2),
-    transforms.ToTensor(),
-    transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225]
-    )
-])
-
-# Example images
-image_paths = ["/Users/sanviadmin/Desktop/IndependentResearchProject/Test_dataset/roi_4/video_013/frame_0194.jpg", "/Users/sanviadmin/Desktop/IndependentResearchProject/Test_dataset/roi_4/video_013/frame_0657.jpg", "/Users/sanviadmin/Desktop/IndependentResearchProject/Test_dataset/roi_4/video_010/frame_0076.jpg"]
-
-for path in image_paths:
-    image = Image.open(path).convert("RGB")
-    image = transform(image).unsqueeze(0)  # add batch dimension
-    image = image.to(device)
-
-    with torch.no_grad():  # no gradients needed
-        output = model(image)
-        pred = output.argmax(dim=1).item()  # predicted class (0 or 1)
-        print(f"{path} -> {pred}")

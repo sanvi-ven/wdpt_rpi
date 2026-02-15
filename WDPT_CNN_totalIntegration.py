@@ -18,13 +18,13 @@ from torchvision.models import resnet18, ResNet18_Weights
 
 from sklearn.model_selection import train_test_split
 
-# 1. Initialize the model architecture
+# initialize the model architecture
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = resnet18(weights=ResNet18_Weights.DEFAULT)
 model.fc = nn.Linear(model.fc.in_features, 2)  # same as training
 model = model.to(device)
 
-# 2. Load saved weights
+# oad saved weights
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def load_model(weights_path):
@@ -77,10 +77,10 @@ def extract_roi_frames(video_path, roi_coords=(684, 185, 984, 377), output_folde
             break
 
         if frame_count % frame_interval == 0:
-            # Crop ROI
+            # crop ROI
             x1, y1, x2, y2 = roi_coords
             roi = frame[y1:y2, x1:x2]
-            # Save frame
+            # save frame
             frame_name = f"frame_{saved_count:04d}.jpg"
             cv2.imwrite(os.path.join(output_folder, frame_name), roi)
             saved_count += 1
@@ -92,7 +92,7 @@ def extract_roi_frames(video_path, roi_coords=(684, 185, 984, 377), output_folde
     return output_folder
 
 def delete_inspection_folder(folder_name="frame_inspection"):
-    # Get the absolute path to ensure we are looking in the right place
+    # get file absolute path
     folder_path = os.path.abspath(folder_name)
     
     if os.path.exists(folder_path):
@@ -127,7 +127,7 @@ def classify_last_frame_from_folder(folder_path):
 
         print(f"{path} -> sand:{pred_sand}, topsoil:{pred_topsoil}")
 
-        # YOUR RULE: if either says 0 → final 0
+        # if either says 0 → final 0
         final_pred = min(pred_sand, pred_topsoil)
 
     return final_pred
@@ -150,24 +150,22 @@ def start_detection(video_path):
         if not ret: break
         frame_count += 1
         roi = frame[313:653, 658:1005]
-        # 1. Now, perform all detection only on the 'roi' instead of the 'frame'
-        fg_mask = backSub.apply(roi)
+        # all detection only on the roi instead of the whole frame to reduce noise and false positives from other areas of the video
         kernel = np.ones((5,5), np.uint8)
         fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_OPEN, kernel) # Removes tiny noise
         
-        # Calculate current 'Activity Score' (number of changing pixels)
+        # calculate activity score(number of changing pixels)
         activity_score = np.count_nonzero(fg_mask)
         activity_log.append(activity_score)
         
-        # 2. Program "Thinking" Logic
         status = "IDLE: Waiting for drop"
-        color = (200, 200, 200) # Gray
+        color = (200, 200, 200) # gray
         
         if start_time is None and frame_count > 1:
-            if activity_score > 1000: # Landing Threshold
+            if activity_score > 1000: # landing threshold
                 start_time = frame_count / fps
                 status = "START DETECTED: Water Landed"
-                color = (0, 255, 0) # Green
+                color = (0, 255, 0)
                 print(f"Status: '{status}' Frame count '{frame_count}'.")
                 return start_time
 
@@ -180,23 +178,23 @@ def analyze_backwards(video_path, x1, y1, x2, y2, output_dir="reverse_analysis")
     fps = cap.get(cv2.CAP_PROP_FPS)
     frames = []
 
-    # 1. Load all frames into memory (for a 50s video, this is manageable)
+    # load all frames into memory 
     while True:
         ret, frame = cap.read()
         if not ret: break
-        # Crop to your ROI immediately to save memory
+        # crop to your ROI immediately to save memory
         roi = frame[y1:y2, x1:x2].copy()
         frames.append(roi)
     cap.release()
 
     total_frames = len(frames)
-    # The last frame is our 'Perfect Absorbed' reference
+    # The last frame is absorbed reference
     final_reference = cv2.cvtColor(frames[-1], cv2.COLOR_BGR2GRAY)
     final_reference = cv2.GaussianBlur(final_reference, (5, 5), 0)
 
     detected_end_frame_idx = None
 
-    # 2. Iterate backwards from the end
+    # check backwards from the end
     for i in range(total_frames - 1, -1, -1):
         current_gray = cv2.cvtColor(frames[i], cv2.COLOR_BGR2GRAY)
         current_gray = cv2.GaussianBlur(current_gray, (5, 5), 0)
@@ -211,9 +209,9 @@ def analyze_backwards(video_path, x1, y1, x2, y2, output_dir="reverse_analysis")
         
         diff_score = np.count_nonzero(thresh)
 
-        # 3. Detection: The first time we see a "blob" (the droplet still existing)
+        # detection: The first time the droplet still existing
         # going backwards, that is the exact moment absorption finished.
-        if diff_score > 50:  # Adjust this 'Difference' threshold
+        if diff_score > 50:  #difference threshold
             detected_end_frame_idx = i
             end_time = i / fps
             cv2.imwrite(f"{output_dir}/detected_end_point.jpg", frames[i])
@@ -229,7 +227,7 @@ frame_folder = extract_roi_frames(video_path, roi_coords, output_folder="frame_i
 
 # 2. Run CNN on last frame
 majority_pred = classify_last_frame_from_folder(frame_folder)
-print(f"ML-based absorption check: {majority_pred} -> {'Not absorbed' if majority_pred==0 else 'Absorbed'}")
+print(f"ML-based absorption check: {majority_pred} -> {'not absorbed' if majority_pred==0 else 'absorbed'}")
 
 # 3. Only run backward detection if absorption occurred
 if majority_pred == 1:
@@ -238,4 +236,4 @@ if majority_pred == 1:
     print(f"Start: {start_time:.2f}s | Reverse End: {end_time:.2f}s | WDPT: {end_time-start_time:.2f}s")
 else:
     end_time = None
-    print("Absorption not detected, skipping end-time detection")
+    print("Absorption not detected so skipping end-time detection")
