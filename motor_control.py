@@ -78,7 +78,7 @@ def deep_till(duration=5):
     forward(duration)
 
 
-def run_pump(duration=1.8):
+def run_pump(duration=1.81):
     print("Pump start")
     arduino.write(b'ON\n')
     threading.Thread(target=pump_off_after, args=(duration,)).start()
