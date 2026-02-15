@@ -116,8 +116,6 @@ else:
     print("WDPT not detected. Skipping tillage.")
     send_pi_command("NO_TILL")
 
-# ---------------- RUN PUMP ----------------
-send_pi_command("PUMP_ON")
 
 # ---------------- CLEANUP ----------------
 pi_sock.close()

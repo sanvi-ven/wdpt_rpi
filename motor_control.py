@@ -41,17 +41,21 @@ def forward(duration=2):
 
 def shallow_till(duration=3):
     print("Shallow till start")
+    pwm = PWMOutputDevice(13) # separate PWM for tiller if needed
+    pwm.value = 0.5   # 50% speed
     d3_ain1.on(); d3_ain2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
 def deep_till(duration=5):
+    pwm = PWMOutputDevice(13) # separate PWM for tiller if needed
+    pwm.value = 0.5   # 50% speed
     print("Deep till start")
     d3_ain1.on(); d3_ain2.off()
     threading.Thread(target=stop_after, args=(duration,)).start()
 
 def run_pump(duration=5):
     print("Pump start")
-    arduino.write(b'PUMP_ON\n')
+    arduino.write(b'ON\n')
     threading.Thread(target=pump_off_after, args=(duration,)).start()
 
 def stop_after(duration):
@@ -60,7 +64,7 @@ def stop_after(duration):
 
 def pump_off_after(duration):
     sleep(duration)
-    arduino.write(b'PUMP_OFF\n')
+    arduino.write(b'OFF\n')
 
 def stop():
     for dev in [d1_ain1, d1_ain2, d1_bin1, d1_bin2,
