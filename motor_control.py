@@ -61,7 +61,7 @@ def shallow_till(duration=0.25):
     # Then move wheels forward using existing forward() function
     forward(duration)
 
-def deep_till(duration=5):
+def deep_till(duration=0.5):
     print("Deep till start")
     stby.on()
     tiller_pwm.value = 0.5
